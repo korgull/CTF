@@ -1,0 +1,91 @@
+Dig for flag.
+
+User: architect
+Password: architect password found in previous challenge
+
+Misleading title.  I initially thought I would be doing a DNS query to get the flag.  Not so.
+
+root@R5040756Kali:~# ssh -p 13375 architect@for01.ringzer0team.com
+architect@for01.ringzer0team.com's password: 
+
+         _                             ____  __                     
+   _____(_)___  ____ _____  ___  _____/ __ \/ /____  ____ _____ ___ 
+  / ___/ / __ \/ __ `/_  / / _ \/ ___/ / / / __/ _ \/ __ `/ __ `__ \
+ / /  / / / / / /_/ / / /_/  __/ /  / /_/ / /_/  __/ /_/ / / / / / /
+/_/  /_/_/ /_/\__, / /___/\___/_/   \____/\__/\___/\__,_/_/ /_/ /_/ 
+             /____/                                                 
+                                      _ _             ___ _____ ___ 
+                             ___ _ _ | (_)_ _  ___   / __|_   _| __|
+                            / _ \ ' \| | | ' \/ -_) | (__  | | | _| 
+                            \___/_||_|_|_|_||_\___|  \___| |_| |_|  
+                                                                    
+
+You have mail.
+Last login: Wed Jun 29 23:37:47 2016 from 66.87.81.164
+
+architect@forensics:~$ find / -user architect 2>/dev/null
+/var/mail/architect
+/var/www/index.php
+/dev/pts/5
+[SNIP]
+/proc/13133/io
+/home/architect
+/home/architect/.profile
+/home/architect/.bash_logout
+/home/architect/.vimrc
+/home/architect/.bashrc
+architect@forensics:~$ 
+
+Take a look at /var/www/index.php:
+
+architect@forensics:~$ more /var/www/index.php 
+
+In the file, we find the following information:
+
+//ENTER THE RELEVANT INFO BELOW
+$mysqlDatabaseName ="arch";
+$mysqlUserName ="arch";
+$mysqlPassword ="asdftgTst5sdf6309sdsdff9lsdftz";
+$mysqlHostName ="127.0.0.1";
+$mysqlExportPath ="/var/tmp/ar.sql";
+
+A database on localhost named "arch", with usename "arch" and password "asdftgTst5sdf6309sdsdff9lsdftz"
+
+use the mysql command to check it out:
+
+architect@forensics:~$ mysql -u arch -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 171
+Server version: 5.5.49-0+deb7u1 (Debian)
+
+Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use arch
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+mysql> show tables;
++----------------+
+| Tables_in_arch |
++----------------+
+| arch           |
+| flag           |
++----------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from flag;
++---------------------------------+
+| flag                            |
++---------------------------------+
+| FLAG-0I68UrLA758G5G30806w637a4k |
++---------------------------------+
+1 row in set (0.00 sec)
+
+mysql> 

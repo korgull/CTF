@@ -1,0 +1,49 @@
+Find Trinity password
+
+User: morpheus
+Password: VNZDDLq2x9qXCzVdABbR1HOtz
+
+log in via ssh:
+
+root@R5040756Kali:~# ssh -p 13375 morpheus@for01.ringzer0team.com 
+morpheus@for01.ringzer0team.com's password: 
+
+         _                             ____  __                     
+   _____(_)___  ____ _____  ___  _____/ __ \/ /____  ____ _____ ___ 
+  / ___/ / __ \/ __ `/_  / / _ \/ ___/ / / / __/ _ \/ __ `/ __ `__ \
+ / /  / / / / / /_/ / / /_/  __/ /  / /_/ / /_/  __/ /_/ / / / / / /
+/_/  /_/_/ /_/\__, / /___/\___/_/   \____/\__/\___/\__,_/_/ /_/ /_/ 
+             /____/                                                 
+                                      _ _             ___ _____ ___ 
+                             ___ _ _ | (_)_ _  ___   / __|_   _| __|
+                            / _ \ ' \| | | ' \/ -_) | (__  | | | _| 
+                            \___/_||_|_|_|_||_\___|  \___| |_| |_|  
+                                                                    
+
+You have mail.
+Last login: Wed Jun 29 18:02:37 2016 from 64.137.255.81
+
+Try grepping for "trinity" in files:
+morpheus@forensics:~$ grep trinity -R / 2>/dev/null
+Binary file /var/run/utmp matches
+[SNIP]
+Binary file /var/log/wtmp.1 matches
+Binary file /var/log/wtmp.2 matches
+Binary file /run/utmp matches
+/etc/rc.local:nohup /root/backup.sh -u trinity -p Flag-08grILsn3ekqhDK7cKBV6ka8B &
+
+FOUND IT HERE.
+
+Also, later on, I also saw it when lookg at processes:
+
+morpheus@forensics:~$ ps aux | grep trinity
+root      3336  0.0  0.0   4188   608 ?        S    Jun01   0:43 /bin/sh /root/backup.sh -u trinity -p Flag-08grILsn3ekqhDK7cKBV6ka8B
+morpheus  3556  0.0  0.0   7840   872 pts/5    S+   18:18   0:00 grep trinity
+root     27133  0.0  0.1  81644  3748 ?        Ss   14:51   0:00 sshd: trinity [priv]
+trinity  27148  0.0  0.1  83740  3784 ?        S    14:52   0:03 sshd: trinity@pts/3
+trinity  27149  0.0  0.1  20620  3452 pts/3    Ss+  14:52   0:00 -bash
+root     30414  0.0  0.0  49656  1524 pts/0    S    16:18   0:00 su trinity
+trinity  30415  0.0  0.1  19456  2244 pts/0    S    16:18   0:00 bash
+morpheus@forensics:~$ 
+
+flag is Flag-08grILsn3ekqhDK7cKBV6ka8B
