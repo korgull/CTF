@@ -99,6 +99,7 @@ encflag.txt.enc  flag.txt
 oracle@forensics:~$ cat flag.txt
 RkxBRy1HSUdzMVdxNlY2U3NaOWg0YVFncEdnZGJkUAo=
 
-python -c 'import base64; var=base64.b64decode("RkxBRy14QXFXMnlKZzd4UERCV3VlVGdqd05jMW5WWQo="); print var'
-FLAG-xAqW2yJg7xPDBWueTgjwNc1nVY
+python -c 'import base64; var=base64.b64decode("RkxBRy1HSUdzMVdxNlY2U3NaOWg0YVFncEdnZGJkUAo="); print var'
+FLAG-GIGs1Wq6V6SsZ9h4aQgpGgdbdP
+
 
