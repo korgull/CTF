@@ -1,0 +1,52 @@
+Decrypt the oracle encrypted file
+
+User: oracle
+
+root@Kali:~# ssh -i private.key -p 13375 oracle@for01.ringzer0team.com
+
+         _                             ____  __                     
+   _____(_)___  ____ _____  ___  _____/ __ \/ /____  ____ _____ ___ 
+  / ___/ / __ \/ __ `/_  / / _ \/ ___/ / / / __/ _ \/ __ `/ __ `__ \
+ / /  / / / / / /_/ / / /_/  __/ /  / /_/ / /_/  __/ /_/ / / / / / /
+/_/  /_/_/ /_/\__, / /___/\___/_/   \____/\__/\___/\__,_/_/ /_/ /_/ 
+             /____/                                                 
+                                      _ _             ___ _____ ___ 
+                             ___ _ _ | (_)_ _  ___   / __|_   _| __|
+                            / _ \ ' \| | | ' \/ -_) | (__  | | | _| 
+                            \___/_||_|_|_|_||_\___|  \___| |_| |_|  
+                                                                    
+
+You have mail.
+Last login: Thu Jun 30 10:06:43 2016 from 129.176.197.23
+
+oracle@forensics:~$ ls -al
+total 36
+drwxr-x---  3 oracle oracle 4096 Mar 12  2014 .
+drwxr-xr-x 10 root   root   4096 Jun 12  2014 ..
+-rw-------  1 root   root      0 Mar 12  2014 .bash_history
+-rw-r-----  1 oracle oracle  220 Dec 29  2012 .bash_logout
+-rw-r-----  1 oracle oracle 3512 Mar 12  2014 .bashrc
+-rw-r-----  1 oracle oracle   90 Mar 12  2014 encflag.txt.enc
+-rw-r-----  1 oracle oracle   45 Mar 12  2014 flag.txt
+-rw-r-----  1 oracle oracle  675 Dec 29  2012 .profile
+drwx------  2 oracle oracle 4096 Mar 12  2014 .ssh
+-rw-r-----  1 oracle oracle   19 Mar  4  2014 .vimrc
+
+Encrypted file is called "encflag.txt.enc"
+
+oracle@forensics:~$ cat encflag.txt.enc 
+U2FsdGVkX1+dCl4WEHNJKBqA8a4fQeheOgA7oiNmjwlJQvGaQAgqcIsGRIcbdHKF
+heSs51JRSEmOLqVyGvoxDA==
+
+Part of it is base64 encoded, but that doesn't get us where we want to be.  Besides, it's encrypted, not encoded.
+
+looking at the files in the dir, we notice that there is an alias set up called "reveal" to decrypt this file!
+
+alias reveal="openssl enc -aes-256-cbc -a -d -in encflag.txt.enc -k 'lp6PWgOwDctq5Yx7ntTmBpOISc'"
+
+
+So, we run the "reveal" command:
+
+oracle@forensics:~$ reveal
+FLAG-IaFOjjFWazycSg0lbVO3T8ZTvz
+
