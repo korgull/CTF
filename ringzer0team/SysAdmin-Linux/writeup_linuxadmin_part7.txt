@@ -1,0 +1,58 @@
+R5040756:~ kef03$ ssh -p 13375 neo@for01.ringzer0team.com 
+neo@for01.ringzer0team.com's password: FLAG-lRGLKGh2895wIAoOvcBbgk4oL
+
+         _                             ____  __                     
+   _____(_)___  ____ _____  ___  _____/ __ \/ /____  ____ _____ ___ 
+  / ___/ / __ \/ __ `/_  / / _ \/ ___/ / / / __/ _ \/ __ `/ __ `__ \
+ / /  / / / / / /_/ / / /_/  __/ /  / /_/ / /_/  __/ /_/ / / / / / /
+/_/  /_/_/ /_/\__, / /___/\___/_/   \____/\__/\___/\__,_/_/ /_/ /_/ 
+             /____/                                                 
+                                      _ _             ___ _____ ___ 
+                             ___ _ _ | (_)_ _  ___   / __|_   _| __|
+                            / _ \ ' \| | | ' \/ -_) | (__  | | | _| 
+                            \___/_||_|_|_|_||_\___|  \___| |_| |_|  
+                                                                    
+
+You have mail.
+Last login: Fri Dec  9 13:10:17 2016 from 129.176.197.23
+neo@forensics:~$ ls
+phonebook  result.stat
+neo@forensics:~$ ls -al
+total 32
+drwxr-x---  2 neo  neo  4096 Mar 12  2014 .
+drwxr-xr-x 10 root root 4096 Jun 12  2014 ..
+lrwxrwxrwx  1 root root    9 Mar 11  2014 .bash_history -> /dev/null
+-rw-r-----  1 neo  neo   220 Mar 10  2014 .bash_logout
+-rw-r-----  1 neo  neo  3414 Mar 10  2014 .bashrc
+-rw-r-----  1 neo  neo   157 Mar 11  2014 phonebook
+-rw-r-----  1 neo  neo   675 Mar 10  2014 .profile
+-rw-r---w-  1 root root    6 Dec  9 13:15 result.stat
+-rw-r-----  1 neo  neo    19 Mar 10  2014 .vimrc
+
+neo@forensics:~$ ps fl -u neo
+F   UID   PID  PPID PRI  NI    VSZ   RSS WCHAN  STAT TTY        TIME COMMAND
+4  1003 19715 19713  20   0   3944   308 -      Ss   ?          0:00 /bin/monitor
+4  1003 17465 17463  20   0   3944   240 -      Ss   ?          0:00 /bin/monitor
+4  1003  9428  9426  20   0   3944   308 -      Ss   ?          0:00 /bin/monitor
+4  1003  6182  6177  20   0   3944   240 -      Ss   ?          0:00 /bin/monitor
+4  1003  3203  3200  20   0   3944   248 -      Ss   ?          0:00 /bin/monitor
+4  1003  3011  3007  20   0   3944   308 -      Ss   ?          0:00 /bin/monitor
+5  1003   371   356  20   0  81648  1728 ?      S    ?          0:00 sshd: neo@pts/0  
+0  1003   373   371  20   0  21416  4192 -      Ss   pts/0      0:00  \_ -bash
+0  1003   464   373  20   0  16840  1024 -      R+   pts/0      0:00      \_ ps fl -u neo
+
+neo@forensics:~$ strace -p19715
+Process 19715 attached - interrupt to quit
+restart_syscall(<... resuming interrupted call ...>) = 0
+write(4294967295, "telnet 127.0.0.1 23\n", 20) = -1 EBADF (Bad file descriptor)
+write(4294967295, "user\n", 5)          = -1 EBADF (Bad file descriptor)
+write(4294967295, "FLAG-a4UVY5HJQO5ddLc5wtBps48A3\n", 31) = -1 EBADF (Bad file descriptor)
+write(4294967295, "get-cpuinfo\n", 12)  = -1 EBADF (Bad file descriptor)
+rt_sigprocmask(SIG_BLOCK, [CHLD], [], 8) = 0
+rt_sigaction(SIGCHLD, NULL, {SIG_DFL, [], 0}, 8) = 0
+rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+nanosleep({10, 0}, ^C <unfinished ...>
+Process 19715 detached
+neo@forensics:~$ 
+
+Flag is FLAG-a4UVY5HJQO5ddLc5wtBps48A3
