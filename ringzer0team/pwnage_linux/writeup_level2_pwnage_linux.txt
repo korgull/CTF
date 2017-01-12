@@ -81,7 +81,7 @@ This GDB was configured as "i486-linux-gnu".
 For bug reporting instructions, please see:
 <http://www.gnu.org/software/gdb/bugs/>...
 Reading symbols from /levels/level2...done.
-(gdb) b *main+315
+(gdb) b *main+315   (breaking just after command is accepted)
 Breakpoint 1 at 0x8048757: file level2.c, line 39.
 (gdb) r
 Starting program: /levels/level2 
