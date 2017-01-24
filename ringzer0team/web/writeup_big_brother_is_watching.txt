@@ -1,0 +1,12 @@
+Check out robots.txt
+https://ringzer0team.com/robots.txt
+
+Which shows:
+User-agent: *
+Disallow: /16bfff59f7e8343a2643bdc2ee76b2dc/
+
+go to:
+https://ringzer0team.com/16bfff59f7e8343a2643bdc2ee76b2dc/
+
+Which presents
+FLAG-G5swO95w0c7R5fq0sa85nVs5dK49O04i 

@@ -1,0 +1,18 @@
+Headache
+
+Looking at the response in a web proxy (e.g. Burp):
+
+HTTP/1.1 200 OK
+Date: Tue, 24 Jan 2017 02:35:53 GMT
+Server: Apache
+X-Powered-By: PHP/5.4.45-0+deb7u6
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Pragma: no-cache
+Flag: FLAG-365m4fU5p2DVEQbfrptDE5Ru   
+Vary: Accept-Encoding
+Content-Length: 7723
+Connection: close
+Content-Type: text/html
+
+The flag is in one of the HTTP response field headers

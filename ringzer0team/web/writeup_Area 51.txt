@@ -1,0 +1,18 @@
+Area 51
+
+https://ringzer0team.com/challenges/48
+
+Simply PUT ;), the GET Method is blocked by the .htaccess rule.  By using a tool that allows you to send a PUT request to the website (e.g. Repeater tool in Burp, or with the RESTED Extension for Firefox, we can get the flag:
+
+
+
+<SNIP>
+<hr />
+        <div class="challenge-wrapper">
+            <br />
+            <span class="red">AREA 51</span> The origin of the Area 51 name is unclear? Alien?<br /><div class="alert alert-info" role="alert">FLAG-w4KRr557y626izv567758O52</div>                      <br />
+            <br />
+        </div>
+
+<hr />
+<SNIP>
